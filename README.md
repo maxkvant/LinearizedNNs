@@ -7,7 +7,7 @@ Descent.](https://arxiv.org/abs/1902.06720)
 
 ## Files
 
-**Wide_NNs_pytorch** - my implementation of wide NNs.
+**Wide_NNs_pytorch** - my implementation of the training method from the paper.
 
 
 **Resnet18** - my attempt, yet unsuccessful, to achieve 94% accuracy via normal ResNet.
