@@ -7,15 +7,14 @@ from training import Training
 
 
 class ClassifierTraining(Training):
-    def __init__(self, estimator, num_classes, device):
+    def __init__(self, estimator, device):
         self.estimator = estimator
         self.device = device
-        self.num_classes = num_classes
 
         self.test_accuracies  = []
         self.train_accuracies = []
 
-    def train(self, num_epochs, learning_rate, train_loader, test_loader):
+    def train(self, train_loader, test_loader, num_epochs=10, learning_rate=0.01):
         self.estimator.set_learning_rate(learning_rate)
         start_time = time.time()
 
@@ -23,7 +22,7 @@ class ClassifierTraining(Training):
             print(f"epoch {epoch}/{num_epochs}, {time.time() - start_time:.0f}s since start")
 
             for batch_id, (X, y) in enumerate(train_loader):
-                X = X.to(self.device)
+                X, y = X.to(self.device), y.to(self.device)
                 self.estimator.fit(X, y)
 
             train_accuracy = self.get_accuracy(train_loader, limit=2000)
@@ -33,7 +32,8 @@ class ClassifierTraining(Training):
 
             self.plot_performance()
 
-        print(f"test_accuracy {test_loader:.3f}")
+        print(f"training took {time.time() - start_time:.0f}s")
+        print(f"test_accuracy {self.get_accuracy(test_loader):.3f}")
 
     def get_accuracy(self, dataloader, limit=None):
         cur_accuracies = []
