@@ -22,6 +22,9 @@ class ClassifierTraining(Training):
             print(f"epoch {epoch}/{num_epochs}, {time.time() - start_time:.0f}s since start")
 
             for batch_id, (X, y) in enumerate(train_loader):
+                if batch_id >= 5:
+                    break
+
                 X, y = X.to(self.device), y.to(self.device)
                 self.estimator.fit(X, y)
 

@@ -9,8 +9,11 @@ def set_bn_eval(m: nn.Module):
         m.eval()
 
 
-def warm_up_batch_norm(model: nn.Module, dataloader, device):
+def warm_up_batch_norm(model: nn.Module, dataloader, device, limit=None):
     for batch_id, (X, y) in enumerate(dataloader):
+        if (limit is not None) and (batch_id >= limit):
+            break
+
         X = X.to(device)
         model.forward(X)
     model.apply(set_bn_eval)

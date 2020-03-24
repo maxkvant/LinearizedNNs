@@ -1,11 +1,9 @@
 import torch
-import torch.nn as nn
 from estimator import Estimator
-from pytorch_impl.nns.utils import to_one_hot
 
 
 class LinearizedSgdEstimator(Estimator):
-    def __init__(self, model, num_classes, learning_rate=5e-3):
+    def __init__(self, model, num_classes, criterion, learning_rate=5e-3):
         self.model = model
         self.num_classes = num_classes
 
@@ -14,6 +12,7 @@ class LinearizedSgdEstimator(Estimator):
         self.w = w.detach().requires_grad_(True)
 
         self.optimizer = None
+        self.criterion = criterion
         self.set_learning_rate(learning_rate)
 
     def set_learning_rate(self, learning_rate):
@@ -25,11 +24,9 @@ class LinearizedSgdEstimator(Estimator):
     def fit(self, X, y):
         self.zero_grad()
 
-        y = to_one_hot(y, self.num_classes)
         output = self.forward(X)
 
-        criterion = nn.MSELoss()
-        loss = criterion(output, y)
+        loss = self.criterion(output, y)
         loss.backward()
 
         self.optimizer.step()
