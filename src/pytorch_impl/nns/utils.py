@@ -15,3 +15,7 @@ def warm_up_batch_norm(model: nn.Module, dataloader, device):
         model.forward(X)
     model.apply(set_bn_eval)
     return model
+
+
+def to_one_hot(y, num_classes):
+    return torch.eye(num_classes)[y] * 2. - 1.
