@@ -32,16 +32,16 @@ class MatrixExpEstimator(Estimator):
             n = len(X)
             print(f"exponentiating kernel matrix ... {time.time() - start_time:.0f}s")
             exp_term = - self.lr * compute_exp_term(- self.lr * theta_0, self.device)
-            right_vector = torch.matmul(exp_term, (-y_residual).double())
+            right_vector = torch.matmul(exp_term, -y_residual)
             del exp_term
 
         ws = [None for _ in range(self.num_classes)]
         for l in range(0, n, self.step):
             r = min(l + self.step, n)
-            grads = self.grads(X[l:r]).double()
+            grads = self.grads(X[l:r])
             for i in range(self.num_classes):
                 with torch.no_grad():
-                    cur_w = torch.mv(grads.T.double(), right_vector[l:r, i])
+                    cur_w = torch.mv(grads.T, right_vector[l:r, i])
                     if ws[i] is None:
                         ws[i] = cur_w
                     else:
@@ -50,7 +50,7 @@ class MatrixExpEstimator(Estimator):
 
     def predict(self, X):
         def predict_one(x):
-            return (self.__grad(x).double() * self.ws).sum(dim=1)
+            return (self.__grad(x) * self.ws).sum(dim=1)
         return torch.stack([predict_one(x) for x in X]).detach()
 
     def grads(self, X):
@@ -70,14 +70,14 @@ class MatrixExpEstimator(Estimator):
     def compute_theta_0(self, X):
         n = X.size()[0]
 
-        Theta_0 = torch.zeros([n,n]).double().to(self.device)
+        Theta_0 = torch.zeros([n,n]).to(self.device)
         for li in range(0, n, self.step):
             ri = min(li + self.step, n)
-            grads_i = self.grads(X[li:ri]).double()
+            grads_i = self.grads(X[li:ri])
 
             for lj in range(0, n, self.step):
                 rj = min(lj + self.step, n)
-                grads_j = self.grads(X[lj:rj]).double()
+                grads_j = self.grads(X[lj:rj])
                 with torch.no_grad():
                     Theta_0[li:ri, lj:rj] = torch.matmul(grads_i, grads_j.T)
                 del grads_j

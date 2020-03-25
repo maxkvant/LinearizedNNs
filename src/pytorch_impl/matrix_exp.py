@@ -1,8 +1,8 @@
 import torch
 
 
-def matrix_exp(M, device, n_iter=30):
-    M = M.to(device)
+def matrix_exp(M, device, n_iter=3):
+    M = M.double().to(device)
 
     n = M.size()[0]
     norm = torch.sqrt((M ** 2).sum())
@@ -12,8 +12,8 @@ def matrix_exp(M, device, n_iter=30):
         norm /= 2.
         steps += 1
 
-    series_sum = torch.eye(n, dtype=torch.float64).to(device)
-    prod = M.to(device)
+    series_sum = torch.eye(n).double().to(device)
+    prod = M.double().to(device)
     for i in range(1, n_iter):
         series_sum = (series_sum + prod)
         prod = torch.matmul(prod, M) / i
@@ -21,13 +21,13 @@ def matrix_exp(M, device, n_iter=30):
     exp = series_sum
     for _ in range(steps):
         exp = torch.matmul(exp, exp)
-    return exp
+    return exp.float()
 
 
 # compute M^-1 * (exp(M) - E)
-def compute_exp_term(M, device, n_iter=30):
+def compute_exp_term(M, device, n_iter=3):
     with torch.no_grad():
-        M = M.to(device)
+        M = M.double().to(device)
 
         n = M.size()[0]
         norm = torch.sqrt((M ** 2).sum())
@@ -37,8 +37,8 @@ def compute_exp_term(M, device, n_iter=30):
             norm /= 2.
             steps += 1
 
-        series_sum = torch.zeros([n, n], dtype=torch.float64).to(device)
-        prod = torch.eye(n, dtype=torch.float64).to(device)
+        series_sum = torch.zeros([n, n]).double().to(device)
+        prod = torch.eye(n).double().to(device)
 
         # series_sum: E + M / 2 + M^2 / 6 + ...
         for i in range(1, n_iter):
@@ -52,4 +52,4 @@ def compute_exp_term(M, device, n_iter=30):
             series_sum = (torch.matmul(series_sum, exp) + series_sum) / 2.
             exp = torch.matmul(exp, exp)
 
-        return series_sum
+        return series_sum.float()
