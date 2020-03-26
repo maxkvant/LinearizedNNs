@@ -6,17 +6,17 @@ class LinearizedSgdEstimator(Estimator):
     def __init__(self, model, num_classes, criterion, learning_rate=5e-3):
         self.model = model
         self.num_classes = num_classes
+        self.criterion = criterion
 
         w_elem = torch.cat([0 * param.view(-1) for param in self.model.parameters()])
         w = torch.stack([w_elem for _ in range(num_classes)]).T
         self.w = w.detach().requires_grad_(True)
 
         self.optimizer = None
-        self.criterion = criterion
         self.set_learning_rate(learning_rate)
 
     def set_learning_rate(self, learning_rate):
-        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=learning_rate, momentum=0.9)
+        self.optimizer = torch.optim.SGD(self.parameters(), lr=learning_rate, momentum=0.9)
 
     def predict(self, X):
         return self.forward(X)
@@ -25,7 +25,6 @@ class LinearizedSgdEstimator(Estimator):
         self.zero_grad()
 
         output = self.forward(X)
-
         loss = self.criterion(output, y)
         loss.backward()
 
