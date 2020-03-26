@@ -22,3 +22,9 @@ def warm_up_batch_norm(model: nn.Module, dataloader, device, limit=None):
 
 def to_one_hot(y, num_classes):
     return torch.eye(num_classes)[y] * 2. - 1.
+
+
+def to_normal(layer):
+    sigma = torch.abs(layer.weight.data).mean() * 2
+    layer.weight.data.normal_(sigma)
+    return layer
