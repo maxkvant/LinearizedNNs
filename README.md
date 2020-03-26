@@ -10,7 +10,7 @@ Descent.](https://arxiv.org/abs/1902.06720)
 **src/pytorch_impl/nns**        - neural networks in pytorch
 
 **src/pytorch_impl/estimators** - estimators that can be trained:
-* `SgdEstimator` - estimator that trains a normal neural network vis SGD
+* `SgdEstimator` - estimator that trains a normal neural network via SGD
 * `LinearizedSgdEstimator`        - estimator that trains a linearized neural network via SGD
 * `MatrixExpEstimator`            - estimator that trains a linearized neural network via closed form solution, which turns out to be matrix exponentital
 
