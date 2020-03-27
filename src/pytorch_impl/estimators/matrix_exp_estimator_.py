@@ -36,6 +36,8 @@ class MatrixExpEstimator(Estimator):
         loss.backward()
         y_residual = y_pred.grad
 
+        print(f"accuracy {(y_pred.argmax(dim=1) == y).float().mean().item():.5f}, loss {loss.item() / len(X):.5f}")
+
         theta_0 = self.compute_theta_0(X)
         print(f"computing grads ... {time.time() - start_time:.0f}s")
 
