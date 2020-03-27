@@ -7,7 +7,7 @@ from pytorch_impl.nns.utils import to_one_hot
 
 
 class MatrixExpEstimator(Estimator):
-    def __init__(self, model, num_classes, device, criterion=None, learning_rate=1., step=1024):
+    def __init__(self, model, num_classes, device, criterion=None, learning_rate=1., step=1024, momentum=0.):
         self.model = model
         self.device = device
         self.lr = learning_rate
@@ -20,10 +20,13 @@ class MatrixExpEstimator(Estimator):
         self.ws = w.detach()
         self.step = step
 
+        self.optimizer = torch.optim.SGD([self.ws], lr=1., momentum=momentum)
+
     def set_learning_rate(self, learning_rate):
         self.lr = learning_rate
 
     def fit(self, X, y):
+        self.zero_grad()
         start_time = time.time()
 
         y_pred = self.predict(X).detach()
@@ -40,7 +43,7 @@ class MatrixExpEstimator(Estimator):
             n = len(X)
             print(f"exponentiating kernel matrix ... {time.time() - start_time:.0f}s")
             exp_term = - self.lr * compute_exp_term(- self.lr * theta_0, self.device)
-            right_vector = torch.matmul(exp_term, y_residual)
+            right_vector = torch.matmul(exp_term, -y_residual)
             del exp_term
 
         ws = [None for _ in range(self.num_classes)]
@@ -54,7 +57,9 @@ class MatrixExpEstimator(Estimator):
                         ws[i] = cur_w
                     else:
                         ws[i] = ws[i] + cur_w
-        self.ws += torch.stack(ws)
+        ws = torch.stack(ws)
+        self.ws.grad = torch.autograd.Variable(ws)
+        self.optimizer.step()
 
     def predict(self, X):
         def predict_one(x):
@@ -64,6 +69,9 @@ class MatrixExpEstimator(Estimator):
     def default_criterion(self, prediction, y):
         y = to_one_hot(y, self.num_classes).to(self.device)
         return .5 * nn.MSELoss(reduction='sum')(prediction, y)
+
+    def zero_grad(self):
+        self.ws.grad = None
 
     def grads(self, X):
         return torch.stack([self.__grad(x) for x in X]).detach()
