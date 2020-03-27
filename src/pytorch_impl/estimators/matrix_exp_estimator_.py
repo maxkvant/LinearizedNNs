@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 import time
 from estimator import Estimator
 from pytorch_impl.matrix_exp import compute_exp_term
@@ -6,11 +7,14 @@ from pytorch_impl.nns.utils import to_one_hot
 
 
 class MatrixExpEstimator(Estimator):
-    def __init__(self, model, num_classes, device, learning_rate, step=1000):
+    def __init__(self, model, num_classes, device, criterion=None, learning_rate=1., step=1024):
         self.model = model
         self.device = device
         self.lr = learning_rate
         self.num_classes = num_classes
+
+        self.criterion = self.default_criterion if (criterion is None) else criterion
+
         w_elem = torch.cat([0 * param.view(-1) for param in self.model.parameters()])
         w = torch.stack([w_elem for _ in range(num_classes)])
         self.ws = w.detach()
@@ -22,8 +26,12 @@ class MatrixExpEstimator(Estimator):
     def fit(self, X, y):
         start_time = time.time()
 
-        y          = to_one_hot(y, num_classes=self.num_classes).to(self.device)
-        y_residual = y - self.predict(X)
+        y_pred = self.predict(X).detach()
+        y_pred.requires_grad = True
+
+        loss = self.criterion(y_pred, y)
+        loss.backward()
+        y_residual = y_pred.grad
 
         theta_0 = self.compute_theta_0(X)
         print(f"computing grads ... {time.time() - start_time:.0f}s")
@@ -32,7 +40,7 @@ class MatrixExpEstimator(Estimator):
             n = len(X)
             print(f"exponentiating kernel matrix ... {time.time() - start_time:.0f}s")
             exp_term = - self.lr * compute_exp_term(- self.lr * theta_0, self.device)
-            right_vector = torch.matmul(exp_term, -y_residual)
+            right_vector = torch.matmul(exp_term, y_residual)
             del exp_term
 
         ws = [None for _ in range(self.num_classes)]
@@ -53,6 +61,10 @@ class MatrixExpEstimator(Estimator):
             return (self.__grad(x) * self.ws).sum(dim=1)
         return torch.stack([predict_one(x) for x in X]).detach()
 
+    def default_criterion(self, prediction, y):
+        y = to_one_hot(y, self.num_classes).to(self.device)
+        return .5 * nn.MSELoss(reduction='sum')(prediction, y)
+
     def grads(self, X):
         return torch.stack([self.__grad(x) for x in X]).detach()
 
@@ -70,7 +82,7 @@ class MatrixExpEstimator(Estimator):
     def compute_theta_0(self, X):
         n = X.size()[0]
 
-        Theta_0 = torch.zeros([n,n]).to(self.device)
+        theta_0 = torch.zeros([n,n]).to(self.device)
         for li in range(0, n, self.step):
             ri = min(li + self.step, n)
             grads_i = self.grads(X[li:ri])
@@ -79,7 +91,7 @@ class MatrixExpEstimator(Estimator):
                 rj = min(lj + self.step, n)
                 grads_j = self.grads(X[lj:rj])
                 with torch.no_grad():
-                    Theta_0[li:ri, lj:rj] = torch.matmul(grads_i, grads_j.T)
+                    theta_0[li:ri, lj:rj] = torch.matmul(grads_i, grads_j.T)
                 del grads_j
             del grads_i
-        return Theta_0
+        return theta_0
