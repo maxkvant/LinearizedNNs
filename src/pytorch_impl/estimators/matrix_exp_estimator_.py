@@ -7,13 +7,15 @@ from pytorch_impl.nns.utils import to_one_hot
 
 
 class MatrixExpEstimator(Estimator):
-    def __init__(self, model, num_classes, device, criterion=None, learning_rate=1., step=1024, momentum=0.):
+    def __init__(self, model, num_classes, device, criterion=None, learning_rate=1., step=1024, momentum=0., reg_param=0.):
         self.model = model
         self.device = device
 
         self.num_classes = num_classes
 
         self.criterion = self.default_criterion if (criterion is None) else criterion
+
+        self.reg_param = reg_param
 
         w_elem = torch.cat([0 * param.view(-1) for param in self.model.parameters()])
         w = torch.stack([w_elem for _ in range(num_classes)])
@@ -130,7 +132,7 @@ class MatrixExpEstimator(Estimator):
                     theta_0[li:ri, lj:rj] = torch.matmul(grads_i, grads_j.T)
                 del grads_j
             del grads_i
-        return theta_0
+        return theta_0 + self.reg_param * torch.eye(n).to(self.device)
 
     def find_beta(self, y_pred, pred_change, y, n_iter=500):
         beta = torch.tensor(1.).to(self.device)
