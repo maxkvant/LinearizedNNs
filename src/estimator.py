@@ -7,3 +7,6 @@ class Estimator:
 
     def set_learning_rate(self, learning_rate):
         pass
+
+    def get_learning_rate(self):
+        pass

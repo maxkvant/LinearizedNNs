@@ -13,10 +13,15 @@ class LinearizedSgdEstimator(Estimator):
         self.w = w.detach().requires_grad_(True)
 
         self.optimizer = None
+        self.learning_rate = None
         self.set_learning_rate(learning_rate)
 
     def set_learning_rate(self, learning_rate):
+        self.learning_rate = learning_rate
         self.optimizer = torch.optim.SGD(self.parameters(), lr=learning_rate, momentum=0.9)
+
+    def get_learning_rate(self):
+        return self.learning_rate
 
     def predict(self, X):
         return self.forward(X)

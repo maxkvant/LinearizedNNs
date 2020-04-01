@@ -9,10 +9,15 @@ class SgdEstimator(Estimator):
         self.criterion = criterion
 
         self.optimizer = None
+        self.learning_rate = None
         self.set_learning_rate(learning_rate)
 
     def set_learning_rate(self, learning_rate):
+        self.learning_rate = learning_rate
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=learning_rate, momentum=0.9)
+
+    def get_learning_rate(self):
+        return self.learning_rate
 
     def fit(self, X, y):
         self.model.zero_grad()

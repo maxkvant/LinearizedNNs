@@ -25,6 +25,9 @@ class MatrixExpEstimator(Estimator):
     def set_learning_rate(self, learning_rate):
         self.lr = learning_rate
 
+    def get_learning_rate(self):
+        return self.lr
+
     def fit(self, X, y):
         self.zero_grad()
         start_time = time.time()
@@ -39,8 +42,6 @@ class MatrixExpEstimator(Estimator):
 
         y_diff = y_pred - to_one_hot(y, self.num_classes)
         scale = (y_diff * y_residual).sum() / (y_residual ** 2).sum()
-
-        print(f"scale {scale}")
 
         print(f"accuracy {(y_pred.argmax(dim=1) == y).float().mean().item():.5f}, loss {loss.item() / len(X):.5f}")
 
@@ -66,16 +67,18 @@ class MatrixExpEstimator(Estimator):
                     else:
                         ws[i] = ws[i] + cur_w
 
-        # TODO: optimize scale for gradient boosting
+        pred_change = torch.matmul(theta_0, right_vector)
+        beta = self.find_beta(y_pred, pred_change, y)
+        print(f"beta = {beta}")
 
         ws = torch.stack(ws)
-        self.ws.grad = torch.autograd.Variable(ws)
+        self.ws.grad = ws * beta
         self.optimizer.step()
 
     def predict(self, X):
         def predict_one(x):
             with torch.no_grad():
-                f0 = self.model.forward(x).view(-1)
+                f0 = self.model.forward(x.unsqueeze(0)).view(-1)
             return (self.__grad(x) * self.ws).sum(dim=1) + f0.detach()
         return torch.stack([predict_one(x) for x in X]).detach()
 
@@ -116,3 +119,13 @@ class MatrixExpEstimator(Estimator):
                 del grads_j
             del grads_i
         return theta_0
+
+    def find_beta(self, y_pred, pred_change, y, n_iter=200):
+        beta = torch.tensor(1., requires_grad=True)
+        learning_rate = 0.01
+        for i in range(n_iter):
+            loss = self.criterion(y_pred - beta * pred_change, y)
+            loss.backward()
+            beta.data -= learning_rate * beta.grad
+            beta.grad = torch.tensor(0.)
+        return max(0., beta.detach().item())
