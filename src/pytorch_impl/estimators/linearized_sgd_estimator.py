@@ -32,7 +32,9 @@ class LinearizedSgdEstimator(Estimator):
 
     def forward(self, X):
         grads = self.grads(X)
-        return torch.matmul(grads, self.w)
+        with torch.no_grad():
+            f0 = self.model.forward(X)
+        return torch.matmul(grads, self.w) + f0.detach()
 
     def zero_grad(self):
         self.w.grad = None
@@ -45,7 +47,7 @@ class LinearizedSgdEstimator(Estimator):
 
     def __grad(self, x):
         self.model.zero_grad()
-        pred = self.model.forward(x.unsqueeze(0))
+        pred = self.model.forward(x.unsqueeze(0))[:,0]
         pred.backward()
         grads = []
         for param in self.model.parameters():
