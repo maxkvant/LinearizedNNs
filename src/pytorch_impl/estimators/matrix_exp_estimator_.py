@@ -10,7 +10,7 @@ class MatrixExpEstimator(Estimator):
     def __init__(self, model, num_classes, device, criterion=None, learning_rate=1., step=1024, momentum=0.):
         self.model = model
         self.device = device
-        self.lr = learning_rate
+
         self.num_classes = num_classes
 
         self.criterion = self.default_criterion if (criterion is None) else criterion
@@ -19,14 +19,23 @@ class MatrixExpEstimator(Estimator):
         w = torch.stack([w_elem for _ in range(num_classes)])
         self.ws = w.detach()
         self.step = step
-
-        self.optimizer = torch.optim.SGD([self.ws], lr=1., momentum=momentum)
+        self.momentum = momentum
+        self.lr = learning_rate
+        self.set_learning_rate(learning_rate)
+        self.optimizer = torch.optim.SGD([self.ws], lr=1., momentum=self.momentum)
 
     def set_learning_rate(self, learning_rate):
         self.lr = learning_rate
 
     def get_learning_rate(self):
         return self.lr
+
+    def set_ws(self, ws):
+        self.ws = ws.clone().detach().to(self.device)
+        self.optimizer = torch.optim.SGD([self.ws], lr=1., momentum=self.momentum)
+
+    def get_ws(self):
+        return self.ws
 
     def fit(self, X, y):
         self.zero_grad()
@@ -40,11 +49,10 @@ class MatrixExpEstimator(Estimator):
 
         y_residual = y_pred.grad
 
-        y_diff = y_pred - to_one_hot(y, self.num_classes)
+        y_diff = y_pred - to_one_hot(y, self.num_classes).to(self.device)
         scale = (y_diff * y_residual).sum() / (y_residual ** 2).sum()
 
-        print(f"accuracy {(y_pred.argmax(dim=1) == y).float().mean().item():.5f}, loss {loss.item() / len(X):.5f}")
-
+        print(f"accuracy before fit {(y_pred.argmax(dim=1) == y).float().mean().item():.5f}, loss {loss.item() / len(X):.5f}")
         theta_0 = self.compute_theta_0(X)
         print(f"computing grads ... {time.time() - start_time:.0f}s")
 
@@ -75,11 +83,15 @@ class MatrixExpEstimator(Estimator):
         self.ws.grad = ws * beta
         self.optimizer.step()
 
+        print(f"fitting done. took {time.time() - start_time:.0f}s")
+        print()
+
     def predict(self, X):
         def predict_one(x):
             with torch.no_grad():
                 f0 = self.model.forward(x.unsqueeze(0)).view(-1)
             return (self.__grad(x) * self.ws).sum(dim=1) + f0.detach()
+
         return torch.stack([predict_one(x) for x in X]).detach()
 
     def default_criterion(self, prediction, y):
@@ -94,7 +106,7 @@ class MatrixExpEstimator(Estimator):
 
     def __grad(self, x):
         self.model.zero_grad()
-        pred = self.model.forward(x.unsqueeze(0))[:,0]
+        pred = self.model.forward(x.unsqueeze(0))[:, 0]
         pred.backward()
         grads = []
         for param in self.model.parameters():
@@ -106,7 +118,7 @@ class MatrixExpEstimator(Estimator):
     def compute_theta_0(self, X):
         n = X.size()[0]
 
-        theta_0 = torch.zeros([n,n]).to(self.device)
+        theta_0 = torch.zeros([n, n]).to(self.device)
         for li in range(0, n, self.step):
             ri = min(li + self.step, n)
             grads_i = self.grads(X[li:ri])
@@ -120,12 +132,13 @@ class MatrixExpEstimator(Estimator):
             del grads_i
         return theta_0
 
-    def find_beta(self, y_pred, pred_change, y, n_iter=200):
-        beta = torch.tensor(1., requires_grad=True)
+    def find_beta(self, y_pred, pred_change, y, n_iter=500):
+        beta = torch.tensor(1.).to(self.device)
+        beta.requires_grad = True
         learning_rate = 0.01
         for i in range(n_iter):
             loss = self.criterion(y_pred - beta * pred_change, y)
             loss.backward()
             beta.data -= learning_rate * beta.grad
-            beta.grad = torch.tensor(0.)
+            beta.grad = torch.tensor(0.).to(self.device)
         return max(0., beta.detach().item())
