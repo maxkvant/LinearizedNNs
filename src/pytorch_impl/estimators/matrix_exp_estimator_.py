@@ -34,7 +34,13 @@ class MatrixExpEstimator(Estimator):
 
         loss = self.criterion(y_pred, y)
         loss.backward()
+
         y_residual = y_pred.grad
+
+        y_diff = y_pred - to_one_hot(y, self.num_classes)
+        scale = (y_diff * y_residual).sum() / (y_residual ** 2).sum()
+
+        print(f"scale {scale}")
 
         print(f"accuracy {(y_pred.argmax(dim=1) == y).float().mean().item():.5f}, loss {loss.item() / len(X):.5f}")
 
@@ -45,7 +51,7 @@ class MatrixExpEstimator(Estimator):
             n = len(X)
             print(f"exponentiating kernel matrix ... {time.time() - start_time:.0f}s")
             exp_term = - self.lr * compute_exp_term(- self.lr * theta_0, self.device)
-            right_vector = torch.matmul(exp_term, -y_residual)
+            right_vector = torch.matmul(exp_term, -y_residual * scale)
             del exp_term
 
         ws = [None for _ in range(self.num_classes)]
@@ -59,18 +65,23 @@ class MatrixExpEstimator(Estimator):
                         ws[i] = cur_w
                     else:
                         ws[i] = ws[i] + cur_w
+
+        # TODO: optimize scale for gradient boosting
+
         ws = torch.stack(ws)
         self.ws.grad = torch.autograd.Variable(ws)
         self.optimizer.step()
 
     def predict(self, X):
         def predict_one(x):
-            return (self.__grad(x) * self.ws).sum(dim=1)
+            with torch.no_grad():
+                f0 = self.model.forward(x).view(-1)
+            return (self.__grad(x) * self.ws).sum(dim=1) + f0.detach()
         return torch.stack([predict_one(x) for x in X]).detach()
 
     def default_criterion(self, prediction, y):
         y = to_one_hot(y, self.num_classes).to(self.device)
-        return .5 * nn.MSELoss(reduction='sum')(prediction, y)
+        return nn.MSELoss()(prediction, y)
 
     def zero_grad(self):
         self.ws.grad = None
@@ -80,7 +91,7 @@ class MatrixExpEstimator(Estimator):
 
     def __grad(self, x):
         self.model.zero_grad()
-        pred = self.model.forward(x.unsqueeze(0))
+        pred = self.model.forward(x.unsqueeze(0))[:,0]
         pred.backward()
         grads = []
         for param in self.model.parameters():

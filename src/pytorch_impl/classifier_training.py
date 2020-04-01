@@ -7,9 +7,10 @@ from training import Training
 
 
 class ClassifierTraining(Training):
-    def __init__(self, estimator, device):
+    def __init__(self, estimator, device, epoch_callback=lambda:None):
         self.estimator = estimator
         self.device = device
+        self.epoch_callback = epoch_callback
 
         self.test_accuracies  = []
         self.train_accuracies = []
@@ -37,6 +38,8 @@ class ClassifierTraining(Training):
             self.test_accuracies.append(test_accuracy)
 
             self.plot_performance()
+
+            self.epoch_callback()
 
         print(f"training took {time.time() - start_time:.0f}s")
         print(f"test_accuracy {self.get_accuracy(test_loader):.3f}")
