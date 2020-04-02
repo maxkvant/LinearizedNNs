@@ -53,15 +53,17 @@ class MatrixExpEstimator(Estimator):
         loss.backward()
         y_residual = y_pred.grad
 
+        print(f"accuracy before fit {(y_pred.argmax(dim=1) == y).float().mean().item():.5f}, loss {loss.item():.5f}")
+
         y_diff = y_pred - to_one_hot(y, self.num_classes).to(self.device)
         scale = (y_diff * y_residual).sum() / (y_residual ** 2).sum()
 
-        self._fit_batch(X, y_residual * scale)
+        self.fit_residuals(X, y_residual * scale)
 
         print(f"fitting done. took {time.time() - start_time:.0f}s")
         print()
 
-    def _fit_batch(self, X, y_residual):
+    def fit_residuals(self, X, y_residual):
         theta_0 = self.compute_theta_0(X)
         print(f"computing grads ...")
 
@@ -84,12 +86,8 @@ class MatrixExpEstimator(Estimator):
                     else:
                         ws[i] = ws[i] + cur_w
 
-        pred_change = torch.matmul(theta_0, right_vector)
-
         self.ws.grad = -torch.stack(ws)
         self.optimizer.step()
-
-        return pred_change
 
     def predict(self, X):
         def predict_one(x):
