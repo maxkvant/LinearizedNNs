@@ -26,7 +26,7 @@ class LinearizedSgdEstimator(Estimator):
     def predict(self, X):
         return self.forward(X)
 
-    def fit(self, X, y):
+    def fit_batch(self, X, y):
         self.zero_grad()
 
         output = self.forward(X)

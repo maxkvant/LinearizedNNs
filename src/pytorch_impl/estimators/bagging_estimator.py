@@ -11,12 +11,12 @@ class BaggingEstimator(Estimator):
         self.items  = 0
         self.learning_rate = self.base_estimator.get_learning_rate()
 
-    def fit(self, X, y):
+    def fit_batch(self, X, y):
         cur_estimator: MatrixExpEstimator = self.estimator_constructor()
         cur_estimator.set_ws(self.base_estimator.ws)
         cur_estimator.set_learning_rate(self.learning_rate)
 
-        cur_estimator.fit(X, y)
+        cur_estimator.fit_batch(X, y)
 
         if self.ws_sum is None:
             self.ws_sum = cur_estimator.ws

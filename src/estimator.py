@@ -2,7 +2,7 @@ class Estimator:
     def predict(self, X):
         pass
 
-    def fit(self, X, y):
+    def fit_batch(self, X, y):
         pass
 
     def set_learning_rate(self, learning_rate):

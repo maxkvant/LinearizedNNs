@@ -19,7 +19,7 @@ class SgdEstimator(Estimator):
     def get_learning_rate(self):
         return self.learning_rate
 
-    def fit(self, X, y):
+    def fit_batch(self, X, y):
         self.model.zero_grad()
 
         output = self.model.forward(X)

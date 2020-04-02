@@ -30,7 +30,7 @@ class ClassifierTraining(Training):
                 prev_len = len(X)
 
                 X, y = X.to(self.device), y.to(self.device)
-                self.estimator.fit(X, y)
+                self.estimator.fit_batch(X, y)
 
             train_accuracy = self.get_accuracy(train_loader, limit=2000)
             test_accuracy  = self.get_accuracy(test_loader,  limit=2000)

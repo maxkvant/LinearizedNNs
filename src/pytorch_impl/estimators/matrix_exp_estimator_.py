@@ -39,7 +39,7 @@ class MatrixExpEstimator(Estimator):
     def get_ws(self):
         return self.ws
 
-    def fit(self, X, y):
+    def fit_batch(self, X, y):
         self.zero_grad()
         start_time = time.time()
 
