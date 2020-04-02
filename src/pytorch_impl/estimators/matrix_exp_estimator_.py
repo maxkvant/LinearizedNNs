@@ -86,8 +86,11 @@ class MatrixExpEstimator(Estimator):
                     else:
                         ws[i] = ws[i] + cur_w
 
+        pred_change = torch.matmul(theta_0, right_vector)
         self.ws.grad = -torch.stack(ws)
         self.optimizer.step()
+
+        return pred_change
 
     def predict(self, X):
         def predict_one(x):

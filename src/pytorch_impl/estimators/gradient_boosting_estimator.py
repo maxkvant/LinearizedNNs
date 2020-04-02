@@ -1,5 +1,5 @@
 import time
-
+import numpy as np
 import torch
 
 from estimator import Estimator
@@ -17,9 +17,7 @@ class GradientBoostingEstimator(Estimator):
         self.base_estimator: MatrixExpEstimator = estimator_constructor()
 
         self.ws_change_sum = None
-        self.ys = []
-        self.Xs = []
-        self.y_predictions_before = []
+        self.betas = []
 
         self.learning_rate = self.base_estimator.get_learning_rate()
 
@@ -31,14 +29,13 @@ class GradientBoostingEstimator(Estimator):
         y_pred = cur_estimator.predict(X).detach()
         y_residual = self.find_y_residual(y_pred, y)
 
-        cur_estimator.fit_residuals(X, y_residual)
+        pred_change = cur_estimator.fit_residuals(X, y_residual)
         cur_ws_change = (cur_estimator.ws - self.base_estimator.ws).detach()
 
-        self.ys.append(y)
-        self.Xs.append(X)
-        self.y_predictions_before.append(y_pred.detach())
+        self.betas.append(self.find_beta(y_pred, pred_change, y))
         self.ws_change_sum = cur_ws_change if (self.ws_change_sum is None) else (self.ws_change_sum + cur_ws_change)
 
+        print(f"current beta {self.betas[-1]}")
         print(f"fitting done. took {time.time() - start_time:.0f}s")
         print()
 
@@ -56,9 +53,7 @@ class GradientBoostingEstimator(Estimator):
         self.base_estimator = self.get_current_estimator()
 
         self.ws_change_sum = None
-        self.ys = []
-        self.Xs = []
-        self.y_predictions_before = []
+        self.betas = []
 
     def find_y_residual(self, y_pred, y):
         y_pred.requires_grad = True
@@ -75,22 +70,14 @@ class GradientBoostingEstimator(Estimator):
         if self.ws_change_sum is None:
             return self.base_estimator
 
-        l = len(self.ys)
+        l = len(self.betas)
+        beta = np.average(self.betas)
+
         estimator: MatrixExpEstimator = self.estimator_constructor()
         estimator.set_learning_rate(self.learning_rate)
-        estimator.set_ws(self.base_estimator.ws + self.ws_change_sum / l)
-
-        y_prediction_changes = [(estimator.predict(X) - pred_before).detach()
-                                for X, pred_before in zip(self.Xs, self.y_predictions_before)]
-
-        beta = self.find_beta(torch.cat(self.y_predictions_before),
-                              torch.cat(y_prediction_changes),
-                              torch.cat(self.ys))
+        estimator.set_ws(self.base_estimator.ws + beta * self.ws_change_sum / l)
 
         print(f"beta {beta}")
-
-        new_ws = self.base_estimator.ws + beta * self.ws_change_sum / l
-        estimator.set_ws(new_ws)
         return estimator
 
     def new_partial_estimator(self):
@@ -109,4 +96,3 @@ class GradientBoostingEstimator(Estimator):
             beta.data -= learning_rate * beta.grad
             beta.grad = torch.tensor(0.).to(self.device)
         return max(0., beta.detach().item())
-
