@@ -1,3 +1,5 @@
+import time
+
 import torch
 
 from estimator import Estimator
@@ -22,6 +24,8 @@ class GradientBoostingEstimator(Estimator):
         self.learning_rate = self.base_estimator.get_learning_rate()
 
     def fit_batch(self, X, y):
+        start_time = time.time()
+
         cur_estimator = self.new_partial_estimator()
 
         y_pred = cur_estimator.predict(X).detach()
@@ -34,6 +38,9 @@ class GradientBoostingEstimator(Estimator):
         self.Xs.append(X)
         self.y_predictions_before.append(y_pred.detach())
         self.ws_change_sum = cur_ws_change if (self.ws_change_sum is None) else (self.ws_change_sum + cur_ws_change)
+
+        print(f"fitting done. took {time.time() - start_time:.0f}s")
+        print()
 
     def set_learning_rate(self, learning_rate):
         self.learning_rate = learning_rate
