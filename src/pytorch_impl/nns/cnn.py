@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -24,17 +23,11 @@ class CNN(nn.Module):
             nn.BatchNorm2d(num_channels),
             nn.ReLU()
         )
-        self.classifier = nn.Linear(num_channels * 2, num_classes, bias=False)
+        self.classifier = nn.Linear(num_channels, num_classes, bias=False)
 
     def forward(self, x):
         x = self.layers(x)
         x_avg = F.adaptive_avg_pool2d(x, (1, 1))
         x_avg = x_avg.view(x_avg.size(0), -1)
 
-        x_max = F.adaptive_max_pool2d(x, (1, 1))
-        x_max = x_max.view(x_max.size(0), -1)
-
-        x = torch.cat([x_avg, x_max], dim=-1)
-
-        return self.classifier(x)
-
+        return self.classifier(x_avg)
