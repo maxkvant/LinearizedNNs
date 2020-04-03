@@ -17,9 +17,10 @@ class MatrixExpEstimator(Estimator):
 
         self.reg_param = reg_param
 
-        w_elem = torch.cat([0 * param.view(-1) for param in self.model.parameters()])
+        w_elem = 0. * self.get_model_param()
         if aug_grad:
-            w_elem = torch.cat([torch.cat([0 * param.view(-1), 0 * param.view(-1)]) for param in self.model.parameters()])
+            w_elem = torch.cat([w_elem, w_elem])
+
         w = torch.stack([w_elem for _ in range(num_classes)])
         self.ws = w.detach()
 
@@ -59,7 +60,7 @@ class MatrixExpEstimator(Estimator):
         self.optimizer = torch.optim.SGD([self.ws], lr=1., momentum=self.momentum)
 
     def get_ws(self):
-        return self.ws
+        return self.ws.clone().detach()
 
     def fit_batch(self, X, y):
         self.zero_grad()
@@ -111,6 +112,9 @@ class MatrixExpEstimator(Estimator):
 
         return pred_change
 
+    def get_model_param(self):
+        return torch.cat([param.view(-1) for param in self.model.parameters()]).detach()
+
     def predict(self, X):
         def predict_one(x):
             with torch.no_grad():
@@ -139,7 +143,7 @@ class MatrixExpEstimator(Estimator):
         grads = []
         for param in self.model.parameters():
             cur_grad = param.grad
-            grads.append(cur_grad.view(-1))
+            grads.append(cur_grad.view(-1))  # TODO: try different parametrization: cur_ / param.view(-1).std()
         grad = torch.cat(grads).detach()
         return grad
 
