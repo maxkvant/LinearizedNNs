@@ -7,10 +7,11 @@ from pytorch_impl.nns.utils import to_one_hot
 
 
 class MatrixExpEstimator(Estimator):
-    def __init__(self, model, num_classes, device, criterion=None, learning_rate=1., step=1024, momentum=0., reg_param=0., aug_grad=False):
+    def __init__(self, model, num_classes, device, criterion=None, learning_rate=1., step=1024, momentum=0.,
+                 reg_param=0., aug_grad=False):
         self.model = model
         self.device = device
-
+        self.std_reciprocals = self.get_std_reciprocals()
         self.num_classes = num_classes
 
         self.criterion = self.default_criterion if (criterion is None) else criterion
@@ -141,9 +142,9 @@ class MatrixExpEstimator(Estimator):
         pred = self.model.forward(x.unsqueeze(0))[:, 0]
         pred.backward()
         grads = []
-        for param in self.model.parameters():
+        for param, std_reciprocal in zip(self.model.parameters(), self.std_reciprocals):
             cur_grad = param.grad
-            grads.append(cur_grad.view(-1))  # TODO: try different parametrization: cur_ / param.view(-1).std()
+            grads.append(std_reciprocal * cur_grad.view(-1))
         grad = torch.cat(grads).detach()
         return grad
 
@@ -155,6 +156,14 @@ class MatrixExpEstimator(Estimator):
 
         non_linearity = 2. * self.aug_c * (grad > self.aug_c).float()
         return torch.cat([grad, non_linearity])
+
+    def get_std_reciprocals(self):
+        res = []
+        for param in self.model.parameters():
+            std = param.view(-1).detach().std().item()
+            std = 1. if (abs(std) < 1e-6) else std
+            res.append(1. / std)
+        return res
 
     def compute_theta_0(self, X):
         n = X.size()[0]
