@@ -8,13 +8,12 @@ from pytorch_impl.nns.utils import to_one_hot
 
 
 class GradientBoostingEstimator(Estimator):
-    def __init__(self, estimator_constructor, num_classes, criterion, device):
-        self.estimator_constructor = estimator_constructor
+    def __init__(self, base_estimator: MatrixExpEstimator, num_classes, criterion, device):
         self.num_classes = num_classes
         self.criterion = criterion
         self.device = device
 
-        self.base_estimator: MatrixExpEstimator = estimator_constructor()
+        self.base_estimator: MatrixExpEstimator = base_estimator
 
         self.ws_change_sum = None
         self.betas = []
@@ -24,7 +23,7 @@ class GradientBoostingEstimator(Estimator):
     def fit_batch(self, X, y):
         start_time = time.time()
 
-        cur_estimator = self.new_partial_estimator()
+        cur_estimator = self.base_estimator.clone()
 
         y_pred = cur_estimator.predict(X).detach()
         y_residual = self.find_y_residual(y_pred, y)
@@ -73,17 +72,11 @@ class GradientBoostingEstimator(Estimator):
         l = len(self.betas)
         beta = np.average(self.betas)
 
-        estimator: MatrixExpEstimator = self.estimator_constructor()
+        estimator: MatrixExpEstimator = self.base_estimator.clone()
         estimator.set_learning_rate(self.learning_rate)
         estimator.set_ws(self.base_estimator.ws + beta * self.ws_change_sum / l)
 
         print(f"beta {beta}")
-        return estimator
-
-    def new_partial_estimator(self):
-        estimator: MatrixExpEstimator = self.estimator_constructor()
-        estimator.set_ws(self.base_estimator.ws)
-        estimator.set_learning_rate(self.learning_rate)
         return estimator
 
     def find_beta(self, y_pred, pred_change, y, n_iter=1000):

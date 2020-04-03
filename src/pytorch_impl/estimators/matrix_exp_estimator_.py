@@ -7,7 +7,7 @@ from pytorch_impl.nns.utils import to_one_hot
 
 
 class MatrixExpEstimator(Estimator):
-    def __init__(self, model, num_classes, device, criterion=None, learning_rate=1., step=1024, momentum=0., reg_param=0.):
+    def __init__(self, model, num_classes, device, criterion=None, learning_rate=1., step=1024, momentum=0., reg_param=0., aug_grad=False):
         self.model = model
         self.device = device
 
@@ -18,8 +18,11 @@ class MatrixExpEstimator(Estimator):
         self.reg_param = reg_param
 
         w_elem = torch.cat([0 * param.view(-1) for param in self.model.parameters()])
+        if aug_grad:
+            w_elem = torch.cat([torch.cat([0 * param.view(-1), 0 * param.view(-1)]) for param in self.model.parameters()])
         w = torch.stack([w_elem for _ in range(num_classes)])
         self.ws = w.detach()
+
         self.step = step
         self.momentum = momentum
         self.lr = learning_rate
@@ -28,6 +31,22 @@ class MatrixExpEstimator(Estimator):
 
         self.last_pred = None
         self.last_pred_change = None
+
+        self.aug_grad = aug_grad
+        self.aug_c = None
+
+    def clone(self):
+        estimator = MatrixExpEstimator(model=self.model,
+                                       num_classes=self.num_classes,
+                                       device=self.device,
+                                       criterion=self.criterion,
+                                       learning_rate=self.lr,
+                                       momentum=self.momentum,
+                                       reg_param=self.reg_param,
+                                       aug_grad=self.aug_grad)
+        estimator.set_ws(self.ws)
+        estimator.aug_c = self.aug_c
+        return estimator
 
     def set_learning_rate(self, learning_rate):
         self.lr = learning_rate
@@ -110,7 +129,10 @@ class MatrixExpEstimator(Estimator):
     def grads(self, X):
         return torch.stack([self.__grad(x) for x in X]).detach()
 
-    def __grad(self, x):
+    def __grad(self, X):
+        return self.__grad_aug(X) if self.aug_grad else self.__grad_no_aug(X)
+
+    def __grad_no_aug(self, x):
         self.model.zero_grad()
         pred = self.model.forward(x.unsqueeze(0))[:, 0]
         pred.backward()
@@ -121,9 +143,17 @@ class MatrixExpEstimator(Estimator):
         grad = torch.cat(grads).detach()
         return grad
 
+    def __grad_aug(self, x):
+        grad = self.__grad_no_aug(x)
+        if self.aug_c is None:
+            self.aug_c = (torch.abs(grad[grad != 0])).mean() / 3.
+            print(f"aug_c {self.aug_c}")
+
+        non_linearity = 2. * self.aug_c * (grad > self.aug_c).float()
+        return torch.cat([grad, non_linearity])
+
     def compute_theta_0(self, X):
         n = X.size()[0]
-
         theta_0 = torch.zeros([n, n]).to(self.device)
         for li in range(0, n, self.step):
             ri = min(li + self.step, n)
