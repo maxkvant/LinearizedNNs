@@ -34,6 +34,9 @@ class GradientBoostingEstimator(Estimator):
         self.betas.append(self.find_beta(y_pred, pred_change, y))
         self.ws_change_sum = cur_ws_change if (self.ws_change_sum is None) else (self.ws_change_sum + cur_ws_change)
 
+        if self.base_estimator.aug_c is None:
+            self.base_estimator.aug_c = cur_estimator.aug_c
+
         print(f"current beta {self.betas[-1]}")
         print(f"fitting done. took {time.time() - start_time:.0f}s")
         print()
