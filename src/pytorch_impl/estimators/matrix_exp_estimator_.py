@@ -151,7 +151,7 @@ class MatrixExpEstimator(Estimator):
     def __grad_aug(self, x):
         grad = self.__grad_no_aug(x)
         if self.aug_c is None:
-            self.aug_c = (torch.abs(grad[grad != 0])).mean() / 3.
+            self.aug_c = (torch.abs(grad[grad != 0])).mean()
             print(f"aug_c {self.aug_c}")
 
         non_linearity = 2. * self.aug_c * (grad > self.aug_c).float()
@@ -160,7 +160,7 @@ class MatrixExpEstimator(Estimator):
     def get_std_reciprocals(self):
         res = []
         for param in self.model.parameters():
-            std = param.view(-1).detach().std().item()
+            std = torch.sqrt((param.view(-1) ** 2).mean()).item()
             std = 1. if (abs(std) < 1e-6) else std
             res.append(1. / std)
         return res
@@ -172,11 +172,13 @@ class MatrixExpEstimator(Estimator):
             ri = min(li + self.step, n)
             grads_i = self.grads(X[li:ri])
 
-            for lj in range(0, n, self.step):
+            for lj in range(0, ri, self.step):
                 rj = min(lj + self.step, n)
                 grads_j = self.grads(X[lj:rj])
                 with torch.no_grad():
-                    theta_0[li:ri, lj:rj] = torch.matmul(grads_i, grads_j.T)
+                    mat_prod = torch.matmul(grads_i, grads_j.T)
+                    theta_0[li:ri, lj:rj] = mat_prod
+                    theta_0[lj:rj, li:ri] = mat_prod.T
                 del grads_j
             del grads_i
         return theta_0 + self.reg_param * torch.eye(n).to(self.device)
