@@ -20,10 +20,6 @@ class CNN(nn.Module):
             nn.Conv2d(num_channels, num_channels, kernel_size=3, stride=2, padding=1, groups=channel_groups, bias=False),  # output: 16 x 16 x num_channels
             nn.BatchNorm2d(num_channels),
             nn.ReLU(),
-
-            nn.Conv2d(num_channels, num_channels, kernel_size=3, stride=2, padding=1, groups=channel_groups, bias=False),  # output:  8 x  8 x num_channels
-            nn.BatchNorm2d(num_channels),
-            nn.ReLU()
         )
         self.classifier = nn.Linear(num_channels, num_classes, bias=False)
 

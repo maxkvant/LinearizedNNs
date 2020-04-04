@@ -31,6 +31,15 @@ def to_one_hot(y, num_classes):
     return torch.eye(num_classes)[y] * 2. - 1.
 
 
+def print_sizes(model):
+    size_sum = 0
+    for param in model.parameters():
+        print(param.size())
+        size_sum += param.view(-1).size()[0]
+    print(size_sum)
+    return size_sum
+
+
 def to_normal(layer):
     sigma = torch.abs(layer.weight.data).mean() * 2
     layer.weight.data.normal_(sigma)
