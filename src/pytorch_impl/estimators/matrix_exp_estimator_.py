@@ -182,3 +182,77 @@ class MatrixExpEstimator(Estimator):
                 del grads_j
             del grads_i
         return theta_0 + self.reg_param * torch.eye(n).to(self.device)
+
+    def _fit_boosted(self, X, y, n_iter=10):
+        n = len(X)
+        index_size = int(n * 0.63)
+
+        theta_0 = self.compute_theta_0(X)
+
+        y_pred = self.predict(X).detach()
+        right_vector = y_pred * 0
+
+        for i in range(n_iter):
+
+            print(f"i = {i}, loss : {self.criterion(y_pred, y):.5f}, exponentiating small kernel matrix ...")
+            index = torch.randperm(n).to(self.device)[:index_size]
+
+            cur_theta_0 = theta_0[index][:, index]
+
+            y_pred = y_pred.clone().detach()
+            y_pred.requires_grad = True
+            loss = self.criterion(y_pred, y)
+            loss.backward()
+            y_residual = y_pred.grad.clone().detach()
+            y_pred = y_pred.clone().detach()
+
+            y_diff = y_pred - to_one_hot(y, self.num_classes).to(self.device)
+            scale = (y_diff * y_residual).sum() / (y_residual ** 2).sum()
+            y_residual *= scale
+
+            exp_term = - self.lr * compute_exp_term(- self.lr * cur_theta_0, self.device)
+
+            d_right_matrix = torch.zeros([n, n]).to(self.device)
+
+            for row, ind in zip(exp_term, index):
+                d_right_matrix[ind, index] = row
+
+            pred_change = torch.matmul(theta_0, torch.matmul(d_right_matrix, y_residual))
+            beta = self.find_beta(y_pred, pred_change, y)
+            print(beta)
+
+            right_vector += beta * torch.matmul(d_right_matrix, y_residual)
+            y_pred += beta * pred_change
+
+        ws = [None for _ in range(self.num_classes)]
+        for l in range(0, n, self.step):
+            r = min(l + self.step, n)
+            grads = self.grads(X[l:r])
+            for i in range(self.num_classes):
+                with torch.no_grad():
+                    cur_w = torch.mv(grads.T, right_vector[l:r, i])
+                    if ws[i] is None:
+                        ws[i] = cur_w
+                    else:
+                        ws[i] = ws[i] + cur_w
+
+        pred_change = torch.matmul(theta_0, right_vector)
+        self.ws.grad = -torch.stack(ws)
+        self.optimizer.step()
+
+        print(f"loss : {self.criterion(y_pred, y)}")
+
+        return pred_change
+
+    def find_beta(self, y_pred, pred_change, y, n_iter=1000):
+        y_pred = y_pred.clone().detach()
+        pred_change = pred_change.clone().detach()
+        beta = torch.tensor(1.).to(self.device)
+        beta.requires_grad = True
+        learning_rate = 0.01
+        for i in range(n_iter):
+            loss = self.criterion(y_pred + beta * pred_change, y)
+            loss.backward()
+            beta.data -= learning_rate * beta.grad
+            beta.grad = torch.tensor(0.).to(self.device)
+        return max(0., beta.detach().item())
