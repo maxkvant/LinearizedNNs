@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<!-- saved from url=(0463)https://b1g50cm84mqj54hlpool.storage.yandexcloud.net/912a6f63-4efe-43d6-8a65-f1a18732607a/user-data/resources/system/9bdcef44-0004-492b-86c9-88c3cb2037b76f1e79d5-fb6c-4c67-a86b-8034b5fc6fa5.html?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20200424T232817Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=mXap0Jx_lcNqHbMis1m-%2F20200424%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=4797333b3cf5663a0586ee3828c056925f169b322764c5681d839af5efdbe12b -->
+<!-- saved from url=(0463)https://b1g50cm84mqj54hlpool.storage.yandexcloud.net/912a6f63-4efe-43d6-8a65-f1a18732607a/user-data/resources/system/9bdcef44-0004-492b-86c9-88c3cb2037b798101ff4-8150-49e2-a3ee-d6e052b66854.html?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20200425T205151Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=mXap0Jx_lcNqHbMis1m-%2F20200425%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=33a2d43eb16b4c6dcb6490b9400b0d4b97397a6ae63a60f0210865167dd3b615 -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<title>6f1e79d5-fb6c-4c67-a86b-8034b5fc6fa5</title>
+<title>98101ff4-8150-49e2-a3ee-d6e052b66854</title>
 
 <script src="./neural_kernels_files/require.min.js"></script>
 <script src="./neural_kernels_files/jquery.min.js"></script>
@@ -13446,7 +13446,7 @@ Please note that these variables can be lost in the next working session
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">lr</span> <span class="o">=</span> <span class="mf">1e4</span>
 <span class="n">exp_term</span> <span class="o">=</span> <span class="o">-</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">compute_exp_term</span><span class="p">(</span><span class="o">-</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">train_kernel</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 
-<span class="n">y_pred</span> <span class="o">=</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">test_kernel</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">exp_term</span><span class="p">,</span> <span class="n">y_train</span><span class="p">))</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">test_kernel</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">exp_term</span><span class="p">,</span> <span class="o">-</span> <span class="n">y_train</span><span class="p">))</span>
 
 <span class="k">del</span> <span class="n">exp_term</span>
 
@@ -13470,39 +13470,6 @@ Please note that these variables can be lost in the next working session
 
 <div class="output_text output_subarea ">
 <pre>tensor(0.7907, device='cuda:0')</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-
-
-<div class="output_text output_subarea ">
-<pre>array([0, 6, 7, 2, 3, 9, 4, 1, 5, 8])</pre>
 </div>
 
 </div>
@@ -13550,68 +13517,51 @@ Please note that these variables can be lost in the next working session
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[75]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">default_criterion</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">to_one_hot</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">boosting</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">labels_train</span><span class="p">,</span> <span class="n">test_kernel</span><span class="p">,</span> <span class="n">labels_test</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e3</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">)</span>
+        <span class="n">block_size</span> <span class="o">=</span> <span class="mi">1280</span>
 
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">default_criterion</span>
+        <span class="n">right_vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">right_vector</span><span class="o">.</span><span class="n">normal_</span><span class="p">()</span>
+        <span class="n">right_vector</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">boosting</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">labels_train</span><span class="p">,</span> <span class="n">test_kernel</span><span class="p">,</span> <span class="n">labels_test</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e3</span><span class="p">):</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">)</span>
-    <span class="n">block_size</span> <span class="o">=</span> <span class="mi">1280</span>
+        <span class="n">n_blocks</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span> <span class="o">//</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">block_size</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">n_blocks</span><span class="p">)</span>
 
-    <span class="n">right_vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">right_vector</span><span class="o">.</span><span class="n">normal_</span><span class="p">()</span>
-    <span class="n">right_vector</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">iter_num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
-    <span class="n">n_blocks</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span> <span class="o">//</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">block_size</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">n_blocks</span><span class="p">)</span>
-    
-    <span class="k">for</span> <span class="n">iter_num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">):</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-        
-        <span class="n">y_pred_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">right_vector</span><span class="p">)</span>
-        <span class="n">y_pred_test</span>  <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">test_kernel</span><span class="p">,</span> <span class="n">right_vector</span><span class="p">)</span>
-        <span class="n">train_acc</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_pred_train</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">labels_train</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-        <span class="n">test_acc</span>  <span class="o">=</span> <span class="p">(</span><span class="n">y_pred_test</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="o">==</span> <span class="n">labels_test</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-        
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"iteration </span><span class="si">{</span><span class="n">iter_num</span><span class="si">}</span><span class="s2"> train_acc </span><span class="si">{</span><span class="n">train_acc</span><span class="si">}</span><span class="s2"> test_acc </span><span class="si">{</span><span class="n">test_acc</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        
-        <span class="n">d_right_matrix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_blocks</span><span class="p">):</span>
-            <span class="n">batch_index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">block_size</span><span class="p">:</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">block_size</span><span class="p">]</span>
+            <span class="n">y_pred_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">right_vector</span><span class="p">)</span>
+            <span class="n">y_pred_test</span>  <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">test_kernel</span><span class="p">,</span> <span class="n">right_vector</span><span class="p">)</span>
+            <span class="n">train_acc</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_pred_train</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">labels_train</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">test_acc</span>  <span class="o">=</span> <span class="p">(</span><span class="n">y_pred_test</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="o">==</span> <span class="n">labels_test</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"iteration </span><span class="si">{</span><span class="n">iter_num</span><span class="si">}</span><span class="s2"> train_acc </span><span class="si">{</span><span class="n">train_acc</span><span class="si">}</span><span class="s2"> test_acc </span><span class="si">{</span><span class="n">test_acc</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+            <span class="n">d_right_vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">y_residual</span>     <span class="o">=</span> <span class="n">y_pred_train</span> <span class="o">-</span> <span class="n">to_one_hot</span><span class="p">(</span><span class="n">labels_train</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
             
-            <span class="n">K</span> <span class="o">=</span> <span class="n">train_kernel</span><span class="p">[</span><span class="n">batch_index</span><span class="p">][:,</span><span class="n">batch_index</span><span class="p">]</span>
-            <span class="n">exp_term</span> <span class="o">=</span> <span class="o">-</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">compute_exp_term</span><span class="p">(</span><span class="o">-</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">K</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_blocks</span><span class="p">):</span>
+                <span class="n">batch_index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">block_size</span><span class="p">:</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">block_size</span><span class="p">]</span>
+                
+                <span class="n">K</span>         <span class="o">=</span> <span class="n">train_kernel</span><span class="p">[</span><span class="n">batch_index</span><span class="p">][:,</span><span class="n">batch_index</span><span class="p">]</span>
+                
+                <span class="n">exp_term</span> <span class="o">=</span> <span class="o">-</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">compute_exp_term</span><span class="p">(</span><span class="o">-</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">K</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+                <span class="n">d_right_vector</span><span class="p">[</span><span class="n">batch_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">exp_term</span><span class="p">,</span> <span class="n">y_residual</span><span class="p">[</span><span class="n">batch_index</span><span class="p">])</span> <span class="o">/</span> <span class="n">n_blocks</span>
+                
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"batch_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> done"</span><span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">exp_term</span><span class="p">,</span> <span class="n">batch_index</span><span class="p">):</span>
-                <span class="n">d_right_matrix</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="n">batch_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span>
+            <span class="n">pred_change</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">d_right_vector</span><span class="p">)</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span> <span class="n">y_residual</span> <span class="o">*</span> <span class="n">pred_change</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="n">pred_change</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"beta = </span><span class="si">{</span><span class="n">beta</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+            <span class="n">right_vector</span> <span class="o">+=</span> <span class="n">d_right_vector</span> <span class="o">*</span> <span class="n">beta</span>
             
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"batch_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> done"</span><span class="p">)</span>
-        
-        <span class="n">d_right_matrix</span> <span class="o">/=</span> <span class="n">n_blocks</span>
-        
-        <span class="n">y_pred_train</span> <span class="o">=</span> <span class="n">y_pred_train</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
-        <span class="n">y_pred_train</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">y_pred_train</span><span class="p">,</span> <span class="n">labels_train</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"loss: </span><span class="si">{</span><span class="n">loss</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        
-        <span class="n">y_residual</span> <span class="o">=</span> <span class="o">-</span> <span class="n">y_pred_train</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
-        
-        <span class="n">y_diff</span> <span class="o">=</span> <span class="n">y_pred_train</span> <span class="o">-</span> <span class="n">to_one_hot</span><span class="p">(</span><span class="n">labels_train</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">scale</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_diff</span> <span class="o">*</span> <span class="n">y_residual</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="n">y_residual</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-        <span class="n">y_residual</span> <span class="o">*=</span> <span class="n">scale</span>
-
-        <span class="n">right_vector_change</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">d_right_matrix</span><span class="p">,</span> <span class="n">y_residual</span><span class="p">)</span>
-        <span class="n">pred_change</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">right_vector_change</span><span class="p">)</span>
-        
-        <span class="n">beta</span> <span class="o">=</span> <span class="n">find_beta</span><span class="p">(</span><span class="n">y_pred_train</span><span class="p">,</span> <span class="n">pred_change</span><span class="p">,</span> <span class="n">labels_train</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"beta </span><span class="si">{</span><span class="n">beta</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="n">right_vector</span> <span class="o">=</span> <span class="p">(</span><span class="n">right_vector</span> <span class="o">+</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">right_vector_change</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">()</span>
 </pre></div>
 
     </div>
@@ -13621,7 +13571,7 @@ Please note that these variables can be lost in the next working session
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[76]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">boosting</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">labels_train</span><span class="p">,</span> <span class="n">test_kernel</span><span class="p">,</span> <span class="n">labels_test</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e4</span><span class="p">)</span>
@@ -13641,31 +13591,8 @@ Please note that these variables can be lost in the next working session
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Error in callback &lt;bound method StateController._post_run_cell of &lt;ml_platform.state.state_controller.StateController object at 0x7fc5b0479150&gt;&gt; (for post_run_cell):
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>KeyboardInterrupt
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
 <pre>7
-iteration 0 train_acc 0.0969531238079071 test_acc 0.09999999403953552
+iteration 0 train_acc 0.10109374672174454 test_acc 0.09999999403953552
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13673,10 +13600,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 1.3554388284683228
-tensor(2., device='cuda:0')
-beta 1.0233323574066162
-iteration 1 train_acc 0.8528124690055847 test_acc 0.723800003528595
+beta = 1.012235403060913
+
+iteration 1 train_acc 0.8474999666213989 test_acc 0.7206000089645386
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13684,10 +13610,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.16800950467586517
-tensor(2., device='cuda:0')
-beta 2.0903313159942627
-iteration 2 train_acc 0.9365624785423279 test_acc 0.762499988079071
+beta = 2.3310978412628174
+
+iteration 2 train_acc 0.9393749833106995 test_acc 0.760699987411499
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13695,10 +13620,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.11499174684286118
-tensor(2., device='cuda:0')
-beta 1.9219924211502075
-iteration 3 train_acc 0.9774999618530273 test_acc 0.7705000042915344
+beta = 1.6579060554504395
+
+iteration 3 train_acc 0.9779687523841858 test_acc 0.777999997138977
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13706,10 +13630,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.08489708602428436
-tensor(2., device='cuda:0')
-beta 1.884117603302002
-iteration 4 train_acc 0.9889843463897705 test_acc 0.7874000072479248
+beta = 1.761630892753601
+
+iteration 4 train_acc 0.9901562333106995 test_acc 0.7876999974250793
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13717,10 +13640,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.0651906430721283
-tensor(2., device='cuda:0')
-beta 1.8941293954849243
-iteration 5 train_acc 0.9958593249320984 test_acc 0.7895999550819397
+beta = 1.7326477766036987
+
+iteration 5 train_acc 0.9957812428474426 test_acc 0.792199969291687
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13728,10 +13650,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.051015742123126984
-tensor(2., device='cuda:0')
-beta 1.8931169509887695
-iteration 6 train_acc 0.9978124499320984 test_acc 0.7902999520301819
+beta = 1.7379014492034912
+
+iteration 6 train_acc 0.9978905916213989 test_acc 0.7976999878883362
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13739,10 +13660,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.04097479209303856
-tensor(2., device='cuda:0')
-beta 1.9062615633010864
-iteration 7 train_acc 0.9996874928474426 test_acc 0.795799970626831
+beta = 1.720777153968811
+
+iteration 7 train_acc 0.9993749856948853 test_acc 0.7967000007629395
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13750,10 +13670,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.033119089901447296
-tensor(2., device='cuda:0')
-beta 1.913704514503479
-iteration 8 train_acc 0.9997655749320984 test_acc 0.7965999841690063
+beta = 1.7294628620147705
+
+iteration 8 train_acc 0.9996874928474426 test_acc 0.7997999787330627
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13761,10 +13680,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.02718816138803959
-tensor(2., device='cuda:0')
-beta 1.9230494499206543
-iteration 9 train_acc 0.9996874928474426 test_acc 0.800599992275238
+beta = 1.69632887840271
+
+iteration 9 train_acc 0.9997655749320984 test_acc 0.7994999885559082
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13772,10 +13690,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.022383807227015495
-tensor(2., device='cuda:0')
-beta 1.92823326587677
-iteration 10 train_acc 1.0 test_acc 0.8011999726295471
+beta = 1.7111916542053223
+
+iteration 10 train_acc 0.9999218583106995 test_acc 0.8021999597549438
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13783,10 +13700,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.018829643726348877
-tensor(2., device='cuda:0')
-beta 1.9361766576766968
-iteration 11 train_acc 0.9999218583106995 test_acc 0.8019999861717224
+beta = 1.6976031064987183
+
+iteration 11 train_acc 0.9999218583106995 test_acc 0.8042999505996704
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13794,10 +13710,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.015856096521019936
-tensor(2., device='cuda:0')
-beta 1.9422279596328735
-iteration 12 train_acc 1.0 test_acc 0.802899956703186
+beta = 1.7411203384399414
+
+iteration 12 train_acc 0.9999218583106995 test_acc 0.8041999936103821
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13805,10 +13720,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.013720177114009857
-tensor(2., device='cuda:0')
-beta 1.9444937705993652
-iteration 13 train_acc 1.0 test_acc 0.8032000064849854
+beta = 1.7255522012710571
+
+iteration 13 train_acc 1.0 test_acc 0.8070999979972839
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13816,10 +13730,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.01196723710745573
-tensor(2., device='cuda:0')
-beta 1.9502300024032593
-iteration 14 train_acc 1.0 test_acc 0.802899956703186
+beta = 1.7200137376785278
+
+iteration 14 train_acc 1.0 test_acc 0.8051999807357788
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13827,10 +13740,9 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.010523167438805103
-tensor(2., device='cuda:0')
-beta 1.9546787738800049
-iteration 15 train_acc 1.0 test_acc 0.8037999868392944
+beta = 1.6607898473739624
+
+iteration 15 train_acc 1.0 test_acc 0.8047999739646912
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13838,53 +13750,8 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-loss: 0.009443983435630798
-tensor(2., device='cuda:0')
-beta 1.9559764862060547
-iteration 16 train_acc 1.0 test_acc 0.8054999709129333
-batch_0 done
-batch_1 done
-batch_2 done
-batch_3 done
-batch_4 done
-batch_5 done
-batch_6 done
-loss: 0.008657381869852543
-tensor(2., device='cuda:0')
-beta 1.9589682817459106
-iteration 17 train_acc 1.0 test_acc 0.8050999641418457
-batch_0 done
-batch_1 done
-batch_2 done
-batch_3 done
-batch_4 done
-batch_5 done
-batch_6 done
-loss: 0.007901756092905998
-tensor(2., device='cuda:0')
-beta 1.960844874382019
-iteration 18 train_acc 1.0 test_acc 0.8036999702453613
-batch_0 done
-batch_1 done
-batch_2 done
-batch_3 done
-batch_4 done
-batch_5 done
-batch_6 done
-loss: 0.007431959733366966
-tensor(2., device='cuda:0')
-beta 1.9627835750579834
-iteration 19 train_acc 1.0 test_acc 0.8039999604225159
-batch_0 done
-batch_1 done
-batch_2 done
-batch_3 done
-batch_4 done
-batch_5 done
-batch_6 done
-loss: 0.00699226139113307
-tensor(2., device='cuda:0')
-beta 1.9657799005508423
+beta = 1.773150086402893
+
 </pre>
 </div>
 </div>
