@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<!-- saved from url=(0463)https://b1g50cm84mqj54hlpool.storage.yandexcloud.net/912a6f63-4efe-43d6-8a65-f1a18732607a/user-data/resources/system/9bdcef44-0004-492b-86c9-88c3cb2037b798101ff4-8150-49e2-a3ee-d6e052b66854.html?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20200425T205151Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=mXap0Jx_lcNqHbMis1m-%2F20200425%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=33a2d43eb16b4c6dcb6490b9400b0d4b97397a6ae63a60f0210865167dd3b615 -->
+<!-- saved from url=(0463)https://b1g50cm84mqj54hlpool.storage.yandexcloud.net/912a6f63-4efe-43d6-8a65-f1a18732607a/user-data/resources/system/9bdcef44-0004-492b-86c9-88c3cb2037b735a705fc-2942-41e2-adb2-92dd773378a3.html?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20200425T231526Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=mXap0Jx_lcNqHbMis1m-%2F20200425%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=a413df97891c917052c06f10d61bac7e47c45055072f025f4878aa7258da14d4 -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<title>98101ff4-8150-49e2-a3ee-d6e052b66854</title>
+<title>35a705fc-2942-41e2-adb2-92dd773378a3</title>
 
 <script src="./neural_kernels_files/require.min.js"></script>
 <script src="./neural_kernels_files/jquery.min.js"></script>
@@ -13429,8 +13429,7 @@ Please note that these variables can be lost in the next working session
 <div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">y_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">num_classes</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)[</span><span class="n">labels_train</span><span class="p">]</span>
-<span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">y_train</span> <span class="o">=</span> <span class="n">to_one_hot</span><span class="p">(</span><span class="n">labels_train</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13517,51 +13516,45 @@ Please note that these variables can be lost in the next working session
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[75]:</div>
+<div class="prompt input_prompt">In&nbsp;[77]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">boosting</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">labels_train</span><span class="p">,</span> <span class="n">test_kernel</span><span class="p">,</span> <span class="n">labels_test</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e3</span><span class="p">):</span>
-    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">)</span>
-        <span class="n">block_size</span> <span class="o">=</span> <span class="mi">1280</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">test_kernel</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+<span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+</pre></div>
 
-        <span class="n">right_vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">right_vector</span><span class="o">.</span><span class="n">normal_</span><span class="p">()</span>
-        <span class="n">right_vector</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    </div>
+</div>
+</div>
 
-        <span class="n">n_blocks</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span> <span class="o">//</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">block_size</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">n_blocks</span><span class="p">)</span>
+<div class="output_wrapper">
+<div class="output">
 
-        <span class="k">for</span> <span class="n">iter_num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">):</span>
-            <span class="n">index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
-            <span class="n">y_pred_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">right_vector</span><span class="p">)</span>
-            <span class="n">y_pred_test</span>  <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">test_kernel</span><span class="p">,</span> <span class="n">right_vector</span><span class="p">)</span>
-            <span class="n">train_acc</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_pred_train</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">labels_train</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-            <span class="n">test_acc</span>  <span class="o">=</span> <span class="p">(</span><span class="n">y_pred_test</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="o">==</span> <span class="n">labels_test</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<div class="output_area">
 
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"iteration </span><span class="si">{</span><span class="n">iter_num</span><span class="si">}</span><span class="s2"> train_acc </span><span class="si">{</span><span class="n">train_acc</span><span class="si">}</span><span class="s2"> test_acc </span><span class="si">{</span><span class="n">test_acc</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <div class="prompt"></div>
 
-            <span class="n">d_right_vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-            <span class="n">y_residual</span>     <span class="o">=</span> <span class="n">y_pred_train</span> <span class="o">-</span> <span class="n">to_one_hot</span><span class="p">(</span><span class="n">labels_train</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-            
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_blocks</span><span class="p">):</span>
-                <span class="n">batch_index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">block_size</span><span class="p">:</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">block_size</span><span class="p">]</span>
-                
-                <span class="n">K</span>         <span class="o">=</span> <span class="n">train_kernel</span><span class="p">[</span><span class="n">batch_index</span><span class="p">][:,</span><span class="n">batch_index</span><span class="p">]</span>
-                
-                <span class="n">exp_term</span> <span class="o">=</span> <span class="o">-</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">compute_exp_term</span><span class="p">(</span><span class="o">-</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">K</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-                <span class="n">d_right_vector</span><span class="p">[</span><span class="n">batch_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">exp_term</span><span class="p">,</span> <span class="n">y_residual</span><span class="p">[</span><span class="n">batch_index</span><span class="p">])</span> <span class="o">/</span> <span class="n">n_blocks</span>
-                
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"batch_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> done"</span><span class="p">)</span>
 
-            <span class="n">pred_change</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">d_right_vector</span><span class="p">)</span>
-            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span> <span class="n">y_residual</span> <span class="o">*</span> <span class="n">pred_change</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="n">pred_change</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"beta = </span><span class="si">{</span><span class="n">beta</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-            <span class="n">right_vector</span> <span class="o">+=</span> <span class="n">d_right_vector</span> <span class="o">*</span> <span class="n">beta</span>
-            
-            <span class="nb">print</span><span class="p">()</span>
+
+<div class="output_text output_subarea ">
+<pre>(10000, 12800)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[95]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">train_kernel</span> <span class="o">=</span> <span class="n">train_kernel</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">test_kernel</span>  <span class="o">=</span> <span class="n">test_kernel</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 </pre></div>
 
     </div>
@@ -13571,10 +13564,121 @@ Please note that these variables can be lost in the next working session
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[76]:</div>
+<div class="prompt input_prompt">In&nbsp;[144]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">boosting</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">labels_train</span><span class="p">,</span> <span class="n">test_kernel</span><span class="p">,</span> <span class="n">labels_test</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e4</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">matmul_via_torch</span><span class="p">(</span><span class="n">numpy_matrix</span><span class="p">,</span> <span class="n">torch_matrix</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2048</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">n</span><span class="p">,</span>  <span class="n">m</span> <span class="o">=</span> <span class="n">numpy_matrix</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">m2</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">torch_matrix</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">m2</span> <span class="o">==</span> <span class="n">m</span>
+        
+        <span class="n">to_torch</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">matrix</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span><span class="o">.</span><span class="n">double</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        
+        <span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">l</span> <span class="o">+</span> <span class="n">step</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">to_torch</span><span class="p">(</span><span class="n">numpy_matrix</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">r</span><span class="p">]),</span> <span class="n">torch_matrix</span><span class="o">.</span><span class="n">double</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[147]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">boosting</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">labels_train</span><span class="p">,</span> <span class="n">test_kernel</span><span class="p">,</span> <span class="n">labels_test</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e3</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">)</span>
+        <span class="n">block_size</span> <span class="o">=</span> <span class="mi">1280</span> <span class="o">*</span> <span class="mi">2</span>
+
+        <span class="n">right_vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="c1"># right_vector.normal_()</span>
+        <span class="c1"># right_vector /= np.sqrt(n)</span>
+
+        <span class="n">n_blocks</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span> <span class="o">//</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">block_size</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">n_blocks</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">iter_num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+            <span class="n">y_pred_train</span> <span class="o">=</span> <span class="n">matmul_via_torch</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">right_vector</span><span class="p">)</span>
+            <span class="n">y_pred_test</span>  <span class="o">=</span> <span class="n">matmul_via_torch</span><span class="p">(</span><span class="n">test_kernel</span><span class="p">,</span> <span class="n">right_vector</span><span class="p">)</span>
+            <span class="n">train_acc</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_pred_train</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">labels_train</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">test_acc</span>  <span class="o">=</span> <span class="p">(</span><span class="n">y_pred_test</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="o">==</span> <span class="n">labels_test</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+            <span class="n">y_residual</span>     <span class="o">=</span> <span class="n">y_pred_train</span> <span class="o">-</span> <span class="n">to_one_hot</span><span class="p">(</span><span class="n">labels_train</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            
+            <span class="n">train_mse</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_residual</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"iteration </span><span class="si">{</span><span class="n">iter_num</span><span class="si">}</span><span class="s2"> train_acc </span><span class="si">{</span><span class="n">train_acc</span><span class="si">}</span><span class="s2"> test_acc </span><span class="si">{</span><span class="n">test_acc</span><span class="si">}</span><span class="s2"> train_mse </span><span class="si">{</span><span class="n">train_mse</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+            <span class="n">d_right_vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_blocks</span><span class="p">):</span>
+                <span class="n">batch_index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">block_size</span><span class="p">:</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">block_size</span><span class="p">]</span>
+                <span class="n">batch_index_np</span> <span class="o">=</span> <span class="n">batch_index</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+                
+                <span class="n">K</span> <span class="o">=</span> <span class="n">train_kernel</span><span class="p">[</span><span class="n">batch_index_np</span><span class="p">][:,</span> <span class="n">batch_index_np</span><span class="p">]</span>
+                <span class="n">K</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">K</span><span class="p">)</span><span class="o">.</span><span class="n">double</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                
+                <span class="n">K</span> <span class="o">=</span> <span class="n">K</span> <span class="o">+</span> <span class="mf">1e-4</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">K</span><span class="p">))</span><span class="o">.</span><span class="n">double</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                
+                <span class="n">exp_term</span> <span class="o">=</span> <span class="o">-</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">compute_exp_term</span><span class="p">(</span><span class="o">-</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">K</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+                <span class="n">d_right_vector</span><span class="p">[</span><span class="n">batch_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">exp_term</span><span class="p">,</span> <span class="n">y_residual</span><span class="p">[</span><span class="n">batch_index</span><span class="p">])</span> <span class="o">/</span> <span class="n">n_blocks</span>
+                
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"batch_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> done"</span><span class="p">)</span>
+
+            <span class="n">pred_change</span> <span class="o">=</span> <span class="n">matmul_via_torch</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">d_right_vector</span><span class="p">)</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span> <span class="n">y_residual</span> <span class="o">*</span> <span class="n">pred_change</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="n">pred_change</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"beta = </span><span class="si">{</span><span class="n">beta</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+            <span class="n">right_vector</span> <span class="o">+=</span> <span class="n">d_right_vector</span> <span class="o">*</span> <span class="n">beta</span>
+            
+            <span class="nb">print</span><span class="p">()</span>
+            
+        <span class="n">y_pred_train</span> <span class="o">=</span> <span class="n">matmul_via_torch</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">right_vector</span><span class="p">)</span>
+        <span class="n">y_pred_test</span>  <span class="o">=</span> <span class="n">matmul_via_torch</span><span class="p">(</span><span class="n">test_kernel</span><span class="p">,</span> <span class="n">right_vector</span><span class="p">)</span>
+        <span class="n">train_acc</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_pred_train</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">labels_train</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">test_acc</span>  <span class="o">=</span> <span class="p">(</span><span class="n">y_pred_test</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="o">==</span> <span class="n">labels_test</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+        <span class="n">y_residual</span>     <span class="o">=</span> <span class="n">y_pred_train</span> <span class="o">-</span> <span class="n">to_one_hot</span><span class="p">(</span><span class="n">labels_train</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">train_mse</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_residual</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"iteration </span><span class="si">{</span><span class="n">n_iter</span><span class="si">}</span><span class="s2"> train_acc </span><span class="si">{</span><span class="n">train_acc</span><span class="si">}</span><span class="s2"> test_acc </span><span class="si">{</span><span class="n">test_acc</span><span class="si">}</span><span class="s2"> train_mse </span><span class="si">{</span><span class="n">train_mse</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[148]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">12800</span>
+<span class="n">train_kernel</span> <span class="o">=</span> <span class="n">kernels_50k</span><span class="p">[</span><span class="s1">'cifar10_train_kernel'</span><span class="p">][:</span><span class="n">N</span><span class="p">,:</span><span class="n">N</span><span class="p">]</span>
+<span class="n">test_kernel</span>  <span class="o">=</span> <span class="n">kernels_50k</span><span class="p">[</span><span class="s1">'cifar10_test_kernel'</span><span class="p">][:,:</span><span class="n">N</span><span class="p">]</span>
+<span class="n">labels_train</span> <span class="o">=</span> <span class="n">kernels_50k</span><span class="p">[</span><span class="s1">'labels_cifar10_train'</span><span class="p">][:</span><span class="n">N</span><span class="p">]</span>
+<span class="n">labels_test</span>  <span class="o">=</span> <span class="n">kernels_50k</span><span class="p">[</span><span class="s1">'labels_cifar10_test'</span><span class="p">]</span>
+
+<span class="n">labels_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">labels_train</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">labels_test</span>  <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">labels_test</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"train_kernel read"</span><span class="p">)</span>
+
+<span class="n">boosting</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">labels_train</span><span class="p">,</span> <span class="n">test_kernel</span><span class="p">,</span> <span class="n">labels_test</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e5</span><span class="p">)</span>
+
+<span class="k">del</span> <span class="n">train_kernel</span>
+<span class="k">del</span> <span class="n">test_kernel</span>
 </pre></div>
 
     </div>
@@ -13591,8 +13695,224 @@ Please note that these variables can be lost in the next working session
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>7
-iteration 0 train_acc 0.10109374672174454 test_acc 0.09999999403953552
+<pre>train_kernel read
+4
+iteration 0 train_acc 0.10007812082767487 test_acc 0.09999999403953552 train_mse 10.0
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.04873788356781
+
+iteration 1 train_acc 0.9248437285423279 test_acc 0.7541999816894531 train_mse 1.2949389219284058
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 2.203456163406372
+
+iteration 2 train_acc 0.9787499904632568 test_acc 0.777999997138977 train_mse 0.6881385445594788
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.6177304983139038
+
+iteration 3 train_acc 0.9954687356948853 test_acc 0.7955999970436096 train_mse 0.39376822113990784
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.7253516912460327
+
+iteration 4 train_acc 0.9990624785423279 test_acc 0.8017999529838562 train_mse 0.2462826520204544
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.706794261932373
+
+iteration 5 train_acc 0.9999218583106995 test_acc 0.8016999959945679 train_mse 0.15554854273796082
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.7525279521942139
+
+iteration 6 train_acc 1.0 test_acc 0.8054999709129333 train_mse 0.09994348138570786
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.719746708869934
+
+iteration 7 train_acc 1.0 test_acc 0.8052999973297119 train_mse 0.06459629535675049
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.7084230184555054
+
+iteration 8 train_acc 1.0 test_acc 0.807699978351593 train_mse 0.04252616688609123
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.7319467067718506
+
+iteration 9 train_acc 1.0 test_acc 0.8084999918937683 train_mse 0.02794771082699299
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.6936376094818115
+
+iteration 10 train_acc 1.0 test_acc 0.8068999648094177 train_mse 0.01870841719210148
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.6945611238479614
+
+iteration 11 train_acc 1.0 test_acc 0.8080999851226807 train_mse 0.012694614939391613
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.7098041772842407
+
+iteration 12 train_acc 1.0 test_acc 0.8083999752998352 train_mse 0.008635403588414192
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.6356565952301025
+
+iteration 13 train_acc 1.0 test_acc 0.808899998664856 train_mse 0.0058340770192444324
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.7261297702789307
+
+iteration 14 train_acc 1.0 test_acc 0.8082999587059021 train_mse 0.00406530499458313
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.6125348806381226
+
+iteration 15 train_acc 1.0 test_acc 0.8091999888420105 train_mse 0.002780697774142027
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.6310672760009766
+
+iteration 16 train_acc 1.0 test_acc 0.8086999654769897 train_mse 0.001913360203616321
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.62857186794281
+
+iteration 17 train_acc 1.0 test_acc 0.8082999587059021 train_mse 0.0013194563798606396
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.6527714729309082
+
+iteration 18 train_acc 1.0 test_acc 0.8098999857902527 train_mse 0.0009573897696100175
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.4873623847961426
+
+iteration 19 train_acc 1.0 test_acc 0.8084999918937683 train_mse 0.0006721442332491279
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.512691855430603
+
+iteration 20 train_acc 1.0 test_acc 0.8091999888420105 train_mse 0.0004680743732023984
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.7296984195709229
+
+iteration 21 train_acc 1.0 test_acc 0.8089999556541443 train_mse 0.00036493776133283973
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.3375378847122192
+
+iteration 22 train_acc 1.0 test_acc 0.8083999752998352 train_mse 0.0002800797519739717
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.259753942489624
+
+iteration 23 train_acc 1.0 test_acc 0.8087999820709229 train_mse 0.00019105021783616394
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+beta = 1.4436439275741577
+
+iteration 24 train_acc 1.0 test_acc 0.8087999820709229 train_mse 0.00017221692542079836
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[149]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">50000</span>
+<span class="n">train_kernel</span> <span class="o">=</span> <span class="n">kernels_50k</span><span class="p">[</span><span class="s1">'cifar10_train_kernel'</span><span class="p">][:</span><span class="n">N</span><span class="p">,:</span><span class="n">N</span><span class="p">]</span>
+<span class="n">test_kernel</span>  <span class="o">=</span> <span class="n">kernels_50k</span><span class="p">[</span><span class="s1">'cifar10_test_kernel'</span><span class="p">][:,:</span><span class="n">N</span><span class="p">]</span>
+<span class="n">labels_train</span> <span class="o">=</span> <span class="n">kernels_50k</span><span class="p">[</span><span class="s1">'labels_cifar10_train'</span><span class="p">][:</span><span class="n">N</span><span class="p">]</span>
+<span class="n">labels_test</span>  <span class="o">=</span> <span class="n">kernels_50k</span><span class="p">[</span><span class="s1">'labels_cifar10_test'</span><span class="p">]</span>
+
+<span class="n">labels_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">labels_train</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">labels_test</span>  <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">labels_test</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"train_kernel read"</span><span class="p">)</span>
+
+<span class="n">boosting</span><span class="p">(</span><span class="n">train_kernel</span><span class="p">,</span> <span class="n">labels_train</span><span class="p">,</span> <span class="n">test_kernel</span><span class="p">,</span> <span class="n">labels_test</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e5</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">48</span><span class="p">)</span>
+
+<span class="k">del</span> <span class="n">train_kernel</span>
+<span class="k">del</span> <span class="n">test_kernel</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>train_kernel read
+14
+iteration 0 train_acc 0.09999999403953552 test_acc 0.09999999403953552 train_mse 10.0
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13600,9 +13920,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.012235403060913
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.0397450923919678
 
-iteration 1 train_acc 0.8474999666213989 test_acc 0.7206000089645386
+iteration 1 train_acc 0.8290799856185913 test_acc 0.767300009727478 train_mse 1.6907768249511719
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13610,9 +13937,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 2.3310978412628174
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 2.6720030307769775
 
-iteration 2 train_acc 0.9393749833106995 test_acc 0.760699987411499
+iteration 2 train_acc 0.9210000038146973 test_acc 0.8202999830245972 train_mse 1.2514768838882446
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13620,9 +13954,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.6579060554504395
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.718910813331604
 
-iteration 3 train_acc 0.9779687523841858 test_acc 0.777999997138977
+iteration 3 train_acc 0.9542799592018127 test_acc 0.8327999711036682 train_mse 1.0264909267425537
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13630,9 +13971,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.761630892753601
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.9227488040924072
 
-iteration 4 train_acc 0.9901562333106995 test_acc 0.7876999974250793
+iteration 4 train_acc 0.9726600050926208 test_acc 0.8406999707221985 train_mse 0.8865413069725037
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13640,9 +13988,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.7326477766036987
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.799692988395691
 
-iteration 5 train_acc 0.9957812428474426 test_acc 0.792199969291687
+iteration 5 train_acc 0.9828199744224548 test_acc 0.847599983215332 train_mse 0.7731997966766357
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13650,9 +14005,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.7379014492034912
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.858919382095337
 
-iteration 6 train_acc 0.9978905916213989 test_acc 0.7976999878883362
+iteration 6 train_acc 0.9905799627304077 test_acc 0.8518999814987183 train_mse 0.6819937229156494
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13660,9 +14022,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.720777153968811
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8290799856185913
 
-iteration 7 train_acc 0.9993749856948853 test_acc 0.7967000007629395
+iteration 7 train_acc 0.9935999512672424 test_acc 0.8550999760627747 train_mse 0.6043972373008728
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13670,9 +14039,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.7294628620147705
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8365813493728638
 
-iteration 8 train_acc 0.9996874928474426 test_acc 0.7997999787330627
+iteration 8 train_acc 0.9962799549102783 test_acc 0.8588999509811401 train_mse 0.5388146638870239
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13680,9 +14056,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.69632887840271
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.870773434638977
 
-iteration 9 train_acc 0.9997655749320984 test_acc 0.7994999885559082
+iteration 9 train_acc 0.9977200031280518 test_acc 0.8610999584197998 train_mse 0.4808780252933502
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13690,9 +14073,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.7111916542053223
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8647146224975586
 
-iteration 10 train_acc 0.9999218583106995 test_acc 0.8021999597549438
+iteration 10 train_acc 0.9985799789428711 test_acc 0.8643999695777893 train_mse 0.43040889501571655
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13700,9 +14090,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.6976031064987183
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8186652660369873
 
-iteration 11 train_acc 0.9999218583106995 test_acc 0.8042999505996704
+iteration 11 train_acc 0.9992599487304688 test_acc 0.8642999529838562 train_mse 0.3870777189731598
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13710,9 +14107,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.7411203384399414
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8235689401626587
 
-iteration 12 train_acc 0.9999218583106995 test_acc 0.8041999936103821
+iteration 12 train_acc 0.9994799494743347 test_acc 0.8671000003814697 train_mse 0.3490350544452667
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13720,9 +14124,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.7255522012710571
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8444191217422485
 
-iteration 13 train_acc 1.0 test_acc 0.8070999979972839
+iteration 13 train_acc 0.9997599720954895 test_acc 0.8690999746322632 train_mse 0.31488609313964844
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13730,9 +14141,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.7200137376785278
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8591744899749756
 
-iteration 14 train_acc 1.0 test_acc 0.8051999807357788
+iteration 14 train_acc 0.999779999256134 test_acc 0.8702999949455261 train_mse 0.28475362062454224
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13740,9 +14158,16 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.6607898473739624
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8234716653823853
 
-iteration 15 train_acc 1.0 test_acc 0.8047999739646912
+iteration 15 train_acc 0.9999399781227112 test_acc 0.871399998664856 train_mse 0.2576996088027954
 batch_0 done
 batch_1 done
 batch_2 done
@@ -13750,8 +14175,560 @@ batch_3 done
 batch_4 done
 batch_5 done
 batch_6 done
-beta = 1.773150086402893
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8369616270065308
 
+iteration 16 train_acc 0.9999599456787109 test_acc 0.8718000054359436 train_mse 0.23388440907001495
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8494360446929932
+
+iteration 17 train_acc 0.9999799728393555 test_acc 0.8740999698638916 train_mse 0.2124701887369156
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8121377229690552
+
+iteration 18 train_acc 0.9999799728393555 test_acc 0.8733999729156494 train_mse 0.19329069554805756
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8490513563156128
+
+iteration 19 train_acc 0.9999799728393555 test_acc 0.875 train_mse 0.17586524784564972
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.844569444656372
+
+iteration 20 train_acc 1.0 test_acc 0.873199999332428 train_mse 0.1601756364107132
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8181421756744385
+
+iteration 21 train_acc 1.0 test_acc 0.8732999563217163 train_mse 0.14608123898506165
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8459794521331787
+
+iteration 22 train_acc 1.0 test_acc 0.8733999729156494 train_mse 0.1333894431591034
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8360437154769897
+
+iteration 23 train_acc 1.0 test_acc 0.8763999938964844 train_mse 0.12174475938081741
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.7964682579040527
+
+iteration 24 train_acc 1.0 test_acc 0.8757999539375305 train_mse 0.11131123453378677
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8542485237121582
+
+iteration 25 train_acc 1.0 test_acc 0.8751999735832214 train_mse 0.10181937366724014
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8030201196670532
+
+iteration 26 train_acc 1.0 test_acc 0.8764999508857727 train_mse 0.09309159964323044
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8901124000549316
+
+iteration 27 train_acc 1.0 test_acc 0.8759999871253967 train_mse 0.08533670008182526
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.7956644296646118
+
+iteration 28 train_acc 1.0 test_acc 0.8751999735832214 train_mse 0.078117236495018
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.7820749282836914
+
+iteration 29 train_acc 1.0 test_acc 0.8761000037193298 train_mse 0.071921706199646
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.7484992742538452
+
+iteration 30 train_acc 1.0 test_acc 0.8772000074386597 train_mse 0.06591076403856277
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8569960594177246
+
+iteration 31 train_acc 1.0 test_acc 0.8763999938964844 train_mse 0.06055278703570366
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8181817531585693
+
+iteration 32 train_acc 1.0 test_acc 0.876800000667572 train_mse 0.05577560514211655
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.7732599973678589
+
+iteration 33 train_acc 1.0 test_acc 0.8777999877929688 train_mse 0.051158610731363297
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.813902497291565
+
+iteration 34 train_acc 1.0 test_acc 0.8774999976158142 train_mse 0.047209158539772034
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.7260230779647827
+
+iteration 35 train_acc 1.0 test_acc 0.8773999810218811 train_mse 0.04355311021208763
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.7495973110198975
+
+iteration 36 train_acc 1.0 test_acc 0.8774999976158142 train_mse 0.040175676345825195
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.742158055305481
+
+iteration 37 train_acc 1.0 test_acc 0.8769999742507935 train_mse 0.03710469976067543
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.736526370048523
+
+iteration 38 train_acc 1.0 test_acc 0.8780999779701233 train_mse 0.034204140305519104
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8698526620864868
+
+iteration 39 train_acc 1.0 test_acc 0.8787999749183655 train_mse 0.03160972148180008
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.6950708627700806
+
+iteration 40 train_acc 1.0 test_acc 0.8780999779701233 train_mse 0.02912450209259987
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.7770711183547974
+
+iteration 41 train_acc 1.0 test_acc 0.878600001335144 train_mse 0.027035590261220932
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.6492453813552856
+
+iteration 42 train_acc 1.0 test_acc 0.8784999847412109 train_mse 0.025147855281829834
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.5944952964782715
+
+iteration 43 train_acc 1.0 test_acc 0.8791999816894531 train_mse 0.023150693625211716
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8473163843154907
+
+iteration 44 train_acc 1.0 test_acc 0.8775999546051025 train_mse 0.021613851189613342
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.5922799110412598
+
+iteration 45 train_acc 1.0 test_acc 0.8789999485015869 train_mse 0.019892770797014236
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.859818696975708
+
+iteration 46 train_acc 1.0 test_acc 0.8787999749183655 train_mse 0.018544016405940056
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.572923183441162
+
+iteration 47 train_acc 1.0 test_acc 0.87909996509552 train_mse 0.017101146280765533
+batch_0 done
+batch_1 done
+batch_2 done
+batch_3 done
+batch_4 done
+batch_5 done
+batch_6 done
+batch_7 done
+batch_8 done
+batch_9 done
+batch_10 done
+batch_11 done
+batch_12 done
+batch_13 done
+beta = 1.8467899560928345
+
+iteration 48 train_acc 1.0 test_acc 0.8788999915122986 train_mse 0.015910344198346138
 </pre>
 </div>
 </div>
