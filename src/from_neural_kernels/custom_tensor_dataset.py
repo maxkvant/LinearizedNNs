@@ -31,9 +31,9 @@ class CustomTensorDataset(torch.utils.data.Dataset):
             if np.random.binomial(1, 0.5) == 1:
                 x = x.flip(2)
             x = self.cutout(x)
-        y = self.targets[idx]
 
-        return x, y
+        y = self.targets[idx]
+        return x.float(), y
 
     def __len__(self):
         return self.data.size(0)
