@@ -9,14 +9,23 @@ class Flatten(nn.Module):
 
 
 def Conv(in_filters, out_filters, groups=1):
-    conv = nn.Conv2d(in_filters, out_filters, kernel_size=3, stride=1, padding=1, groups=groups, bias=False)
+    conv = nn.Conv2d(in_filters * groups, out_filters * groups, kernel_size=3, stride=1, padding=1, groups=groups, bias=False)
+    scale = 1. / np.sqrt(in_filters * 9)
+    conv.weight.data.uniform_(-scale, scale)
     conv.weight.data *= np.sqrt(3)
     return conv
 
 
 class Normalize(nn.Module):
+    def __init__(self, group_size):
+        super(Normalize, self).__init__()
+        self.group_size = group_size
+
     def forward(self, input):
-        return nn.functional.normalize(input, p=2, dim=1, eps=1e-8)
+        n, _ = input.size()
+        input = input.view(-1, self.group_size)
+        input = nn.functional.normalize(input, p=2, dim=1, eps=1e-8)
+        return input.view(n, -1)
 
 
 class ReLU2(nn.Module):
