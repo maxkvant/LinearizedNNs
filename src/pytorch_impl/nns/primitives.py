@@ -17,15 +17,18 @@ def Conv(in_filters, out_filters, groups=1):
 
 
 class Normalize(nn.Module):
-    def __init__(self, group_size):
+    def __init__(self, group_size=None):
         super(Normalize, self).__init__()
         self.group_size = group_size
 
     def forward(self, input):
-        n, _ = input.size()
-        input = input.view(-1, self.group_size)
-        input = nn.functional.normalize(input, p=2, dim=1, eps=1e-8)
-        return input.view(n, -1)
+        if self.group_size is not None:
+            n, m = input.size()
+            input = input.view(-1, self.group_size)
+            input = nn.functional.normalize(input, p=2, dim=1, eps=1e-8)
+            return input.view(n, -1) / np.sqrt(m // self.group_size)
+        else:
+            return nn.functional.normalize(input, p=2, dim=1, eps=1e-8)
 
 
 class ReLU2(nn.Module):
