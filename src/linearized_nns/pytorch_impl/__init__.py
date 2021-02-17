@@ -1,1 +1,1 @@
-from pytorch_impl.classifier_training import ClassifierTraining
+from linearized_nns.pytorch_impl.classifier_training import ClassifierTraining
