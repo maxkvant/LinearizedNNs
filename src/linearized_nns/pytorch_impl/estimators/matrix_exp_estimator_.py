@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 import time
-from estimator import Estimator
-from pytorch_impl.matrix_exp import compute_exp_term
-from pytorch_impl.nns.utils import to_one_hot
+from linearized_nns.estimator import Estimator
+from linearized_nns.pytorch_impl.matrix_exp import compute_exp_term
+from linearized_nns.pytorch_impl.nns.utils import to_one_hot
 
 
 class MatrixExpEstimator(Estimator):

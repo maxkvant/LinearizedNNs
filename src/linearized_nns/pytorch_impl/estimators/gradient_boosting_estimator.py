@@ -2,9 +2,9 @@ import time
 import numpy as np
 import torch
 
-from estimator import Estimator
-from pytorch_impl.estimators import MatrixExpEstimator
-from pytorch_impl.nns.utils import to_one_hot
+from linearized_nns.estimator import Estimator
+from linearized_nns.pytorch_impl.estimators import MatrixExpEstimator
+from linearized_nns.pytorch_impl.nns.utils import to_one_hot
 
 
 class GradientBoostingEstimator(Estimator):

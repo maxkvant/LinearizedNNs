@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 
-from estimator import Estimator
+from linearized_nns.estimator import Estimator
 
 
 class ForrestEstimator(Estimator):

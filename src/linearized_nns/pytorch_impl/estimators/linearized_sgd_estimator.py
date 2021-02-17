@@ -1,5 +1,5 @@
 import torch
-from estimator import Estimator
+from linearized_nns.estimator import Estimator
 
 
 class LinearizedSgdEstimator(Estimator):
