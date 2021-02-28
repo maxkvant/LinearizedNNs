@@ -20,6 +20,7 @@ class ClassifierTraining(Training):
         start_time = time.time()
 
         for epoch in range(num_epochs):
+            cle
             print(f"epoch {epoch}/{num_epochs}, {time.time() - start_time:.0f}s since start")
 
             prev_len = None
